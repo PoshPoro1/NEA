@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/Suspect.dir/src/main.cpp.o CMakeFiles/Suspect.dir/src/glad.c.o CMakeFiles/Suspect.dir/src/shader.cpp.o CMakeFiles/Suspect.dir/src/controls.cpp.o -o Suspect  /usr/local/lib/libglfw3.a -Wl,-Bstatic -lrt -Wl,-Bdynamic -lm -ldl -lX11 
