@@ -149,7 +149,22 @@ int main(){
     glGenBuffers(1, &CAO);
     glBindBuffer(GL_ARRAY_BUFFER, CAO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+    double lastTime = glfwGetTime();
+    int nbFrames = 0;
+
     while (!(glfwWindowShouldClose(window))){
+
+	    //FRAME TIMES
+	    double currentTime = glfwGetTime();
+	    nbFrames++;
+
+	    if(currentTime - lastTime >= 1.0){
+		    std::cout << 1000/double(nbFrames) << "ms per frame" << std::endl;
+		    nbFrames = 0;
+		    lastTime += 1;
+	    }
+
+
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	    myshader.use();
 	    computeMatricesFromInputs();
