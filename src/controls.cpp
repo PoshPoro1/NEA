@@ -53,6 +53,7 @@ void computeMatricesFromInputs(){
 	if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
 		position -= right * deltaTime * speed;
 	}
+
 	ProjectionMatrix = glm::perspective(glm::radians(60.0f), 4.0f/3.0f, 0.1f, 100.0f);
 	ViewMatrix = glm::lookAt(
 			position,

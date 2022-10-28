@@ -102,7 +102,11 @@ GLuint indices[] =
 	2, 3, 4,
 	3, 0, 4
 };
-
+void processInputs(GLFWwindow* window){
+	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+		glfwSetWindowShouldClose(window, true);
+	}
+}
 void framebufferSizeCallback(GLFWwindow* window, int width, int height){
     glViewport(0,0,width,height);
 }
@@ -131,6 +135,7 @@ int main(){
     glfwSetCursorPos(window,1024.0f/2,768.0f/2.0f);
 
 
+
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -153,6 +158,7 @@ int main(){
     int nbFrames = 0;
 
     while (!(glfwWindowShouldClose(window))){
+	    processInputs(window);
 
 	    //FRAME TIMES
 	    double currentTime = glfwGetTime();
