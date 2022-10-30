@@ -102,7 +102,11 @@ GLuint indices[] =
 	2, 3, 4,
 	3, 0, 4
 };
-
+void processInputs(GLFWwindow* window){
+	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+		glfwSetWindowShouldClose(window, true);
+	}
+}
 void framebufferSizeCallback(GLFWwindow* window, int width, int height){
     glViewport(0,0,width,height);
 }
@@ -113,7 +117,7 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(1024,768,"suspicious", NULL,NULL);
+    window = glfwCreateWindow(1024,768,"NEA", NULL,NULL);
     if(window == NULL){
 	    std::cout << "Failed to make window using GLFW" << std::endl;
 	    glfwTerminate();
@@ -129,6 +133,7 @@ int main(){
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     glfwSetCursorPos(window,1024.0f/2,768.0f/2.0f);
+
 
 
     glEnable(GL_DEPTH_TEST);
@@ -149,7 +154,23 @@ int main(){
     glGenBuffers(1, &CAO);
     glBindBuffer(GL_ARRAY_BUFFER, CAO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+    double lastTime = glfwGetTime();
+    int nbFrames = 0;
+
     while (!(glfwWindowShouldClose(window))){
+	    processInputs(window);
+
+	    //FRAME TIMES
+	    double currentTime = glfwGetTime();
+	    nbFrames++;
+
+	    if(currentTime - lastTime >= 1.0){
+		    std::cout << 1000/double(nbFrames) << "ms per frame" << std::endl;
+		    nbFrames = 0;
+		    lastTime += 1;
+	    }
+
+
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	    myshader.use();
 	    computeMatricesFromInputs();
