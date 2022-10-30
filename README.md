@@ -1,2 +1,5 @@
 # NEA
-To build this please run cmake .. in a directory called build
+## Dependencies
+To compile this program you will need glfw & glm
+
+
