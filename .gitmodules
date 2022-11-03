@@ -1,4 +1,3 @@
-[submodule "imgui"]
-	path = imgui
+[submodule "extern/imgui"]
+	path = extern/imgui
 	url = https://github.com/ocornut/imgui
-	branch = master
