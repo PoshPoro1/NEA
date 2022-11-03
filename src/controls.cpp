@@ -19,7 +19,7 @@ float hoizontalAngle = 3.14f;
 float verticalAngle = 0.0f;
 float initialFOV = 45.0f;
 float speed = 5.0f;
-float mouseSpeed = 0.080f;
+float mouseSpeed = 0.005f;
 
 void computeMatricesFromInputs(){
 	static double lastTime = glfwGetTime();
@@ -30,8 +30,8 @@ void computeMatricesFromInputs(){
 	double xpos,ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 	glfwSetCursorPos(window, 1024.0f/2, 768.0f/2);
-	hoizontalAngle += mouseSpeed * deltaTime * float(1024.0f/2.0f - xpos);
-	verticalAngle += mouseSpeed * deltaTime * float(768.0f/2.0f-ypos);
+	hoizontalAngle += mouseSpeed * float(1024.0f/2.0f - xpos);
+	verticalAngle += mouseSpeed * float(768.0f/2.0f-ypos);
 
 	glm::vec3 direction = glm::vec3(
 			cos(verticalAngle) * sin(hoizontalAngle),
