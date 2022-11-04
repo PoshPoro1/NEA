@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "imgui_internal.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 GLFWwindow* window;
@@ -174,6 +175,8 @@ int main(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     bool wireframe = false;
     bool currentDraw = 1; // 1 is fill 0 is wireframe
+    bool vsync = true;
+    bool currentsync = 1;
 
 
 
@@ -190,6 +193,15 @@ int main(){
 		    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		    currentDraw = 1;
 	    }
+	    if(vsync == true && currentsync == 0){
+		    glfwSwapInterval(1);
+		    currentsync = 1;
+	    }
+	    else if(vsync == false && currentsync == 1){
+		    glfwSwapInterval(0);
+		    currentsync = 0;
+	    }
+
 
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	    ImGui_ImplOpenGL3_NewFrame();
@@ -218,6 +230,13 @@ int main(){
 		    ImGui::Begin("Window");
 		    ImGui::Text("Gamering");
 		    ImGui::Checkbox("Wireframe mode", &wireframe);
+		    ImGui::Checkbox("Vsync", &vsync);
+		    ImGui::Text("Current fps: %f", ImGui::GetIO().Framerate);
+		    if(ImGui::Button("Exit")){
+			    glfwSetWindowShouldClose(window, 1);
+		    }
+
+
 		    ImGui::End();
 
 	    }
