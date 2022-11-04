@@ -1,1 +1,0 @@
-{"cargo":{"dap_name":"lldb"},"cmake":{"cmd":"cmake","build_dir":"{cwd}\/build\/{os}-{build_type}","target":"Suspect","build_type":"Debug","args":{"configure":["-D","CMAKE_EXPORT_COMPILE_COMMANDS=1","-G","Ninja"]},"dap_name":"lldb"}}

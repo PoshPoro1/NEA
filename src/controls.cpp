@@ -20,6 +20,13 @@ float verticalAngle = 0.0f;
 float initialFOV = 45.0f;
 float speed = 5.0f;
 float mouseSpeed = 0.005f;
+bool imguishow = false;
+
+void globalBindings(){
+	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+		imguishow = !imguishow; // toggles imgui
+	}
+}
 
 void computeMatricesFromInputs(){
 	static double lastTime = glfwGetTime();
@@ -41,17 +48,23 @@ void computeMatricesFromInputs(){
 	glm::vec3 right = glm::vec3(sin(hoizontalAngle-3.14f/2.0f), 0, cos(hoizontalAngle - 3.14f/2.0f));
 	glm::vec3 up = glm::cross(right, direction);
 
-	if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-		position += direction*deltaTime*speed;
-	}
-	if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-		position -= direction * deltaTime * speed;
-	}
-	if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-		position += right * deltaTime * speed;
-	}
-	if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-		position -= right * deltaTime * speed;
+
+	//PUT CONTROLS HERE!
+
+	{
+
+		if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+			position += direction*deltaTime*speed;
+		}
+		if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+			position -= direction * deltaTime * speed;
+		}
+		if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+			position += right * deltaTime * speed;
+		}
+		if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+			position -= right * deltaTime * speed;
+		}
 	}
 
 	ProjectionMatrix = glm::perspective(glm::radians(60.0f), 4.0f/3.0f, 0.1f, 100.0f);
