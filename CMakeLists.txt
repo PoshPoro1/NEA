@@ -27,7 +27,7 @@ file(
 		"extern/imgui/*.h"
 		)
 
-target_link_libraries(NEA glfw glm)
+target_link_libraries(NEA glfw)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
