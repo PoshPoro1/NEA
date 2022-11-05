@@ -1,9 +1,13 @@
 #include <iostream>
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+#include "imgui_internal.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 GLFWwindow* window;
-#include <fstream>
-#include <cerrno>
+#include <fstream> 
+#include <cerrno> 
 #include <locale>
 #include <string>
 #include <sstream>
@@ -102,19 +106,22 @@ GLuint indices[] =
 	2, 3, 4,
 	3, 0, 4
 };
-void processInputs(GLFWwindow* window){
-	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
-		glfwSetWindowShouldClose(window, true);
+
+//Keys I want to only call once after press
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+		imguishow = !imguishow;
+		glfwSetCursorPos(window,1024.0f/2,768.0f/2.0f);
 	}
 }
 void framebufferSizeCallback(GLFWwindow* window, int width, int height){
-    glViewport(0,0,width,height);
+	glViewport(0,0,width,height);
 }
 
 int main(){
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(1024,768,"NEA", NULL,NULL);
@@ -131,13 +138,15 @@ int main(){
     }
     glViewport(0,0,1024,768);
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     glfwSetCursorPos(window,1024.0f/2,768.0f/2.0f);
+    
 
 
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glfwSetKeyCallback(window, key_callback);
+
 
 
     const char* vertexPath = "Shaders/vertex.vs";
@@ -156,29 +165,57 @@ int main(){
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
     double lastTime = glfwGetTime();
     int nbFrames = 0;
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    bool wireframe = false;
+    bool currentDraw = 1; // 1 is fill 0 is wireframe
+    bool vsync = true;
+    bool currentsync = 1;
+
+
+
 
     while (!(glfwWindowShouldClose(window))){
-	    processInputs(window);
-
-	    //FRAME TIMES
-	    double currentTime = glfwGetTime();
-	    nbFrames++;
-
-	    if(currentTime - lastTime >= 1.0){
-		    std::cout << 1000/double(nbFrames) << "ms per frame" << std::endl;
-		    nbFrames = 0;
-		    lastTime += 1;
+	    if(imguishow == false){
+		    ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+	    }
+	    if(wireframe == true && currentDraw ==1 ){
+		    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		    currentDraw = 0;
+	    }
+	    else if(wireframe == false && currentDraw == 0){
+		    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		    currentDraw = 1;
+	    }
+	    if(vsync == true && currentsync == 0){
+		    glfwSwapInterval(1);
+		    currentsync = 1;
+	    }
+	    else if(vsync == false && currentsync == 1){
+		    glfwSwapInterval(0);
+		    currentsync = 0;
 	    }
 
 
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	    ImGui_ImplOpenGL3_NewFrame();
+	    ImGui_ImplGlfw_NewFrame();
+	    ImGui::NewFrame();
 	    myshader.use();
-	    computeMatricesFromInputs();
-	    glm::mat4 Projection = getProjectionMatrix();
-	    glm::mat4 View = getViewMatrix();
-	    glm::mat4 Model = glm::mat4(1.0f);
-	    glm::mat4 mvp = Projection*View*Model;
-	    glUniformMatrix4fv(matID, 1, GL_FALSE, &mvp[0][0]);
+	    if(imguishow == false){
+		    computeMatricesFromInputs();
+		    glm::mat4 Projection = getProjectionMatrix();
+		    glm::mat4 View = getViewMatrix();
+		    glm::mat4 Model = glm::mat4(1.0f);
+		    glm::mat4 mvp = Projection*View*Model;
+		    glUniformMatrix4fv(matID, 1, GL_FALSE, &mvp[0][0]);
+	    }
 
 	    glEnableVertexAttribArray(0);
 	    glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -189,6 +226,26 @@ int main(){
 	    glEnableVertexAttribArray(1);
 	    glBindBuffer(GL_ARRAY_BUFFER, CAO);
 	    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,(void*)0);
+	    if(imguishow == true){
+		    ImGui::Begin("Window");
+		    ImGui::Text("Gamering");
+		    ImGui::Checkbox("Wireframe mode", &wireframe);
+		    ImGui::Checkbox("Vsync", &vsync);
+		    ImGui::Text("Current fps: %f", ImGui::GetIO().Framerate);
+		    if(ImGui::Button("Exit")){
+			    glfwSetWindowShouldClose(window, 1);
+		    }
+
+
+		    ImGui::End();
+
+	    }
+	    ImGui::Render();
+	    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
+
 
 	    glfwSwapBuffers(window);
 	    glfwPollEvents();
@@ -198,6 +255,9 @@ int main(){
 
     // Making and binding VBO
     glfwTerminate();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     return 0;
     
 }

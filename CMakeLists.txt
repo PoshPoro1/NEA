@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.24)
 project(NEA VERSION 0.1.0)
 
 include(CTest)
@@ -7,10 +7,17 @@ enable_testing()
 find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
 
-add_executable(NEA src/main.cpp src/glad.c src/shader.cpp src/controls.cpp)
-target_include_directories(NEA PRIVATE include) 
 
-target_link_libraries(NEA glfw)
+add_executable(NEA src/main.cpp src/glad.c src/shader.cpp src/controls.cpp extern/imgui/backends/imgui_impl_glfw.cpp extern/imgui/backends/imgui_impl_opengl3.cpp extern/imgui/imgui.cpp extern/imgui/imgui_draw.cpp extern/imgui/imgui_tables.cpp extern/imgui/imgui_widgets.cpp)
+target_include_directories(NEA PRIVATE include) 
+include_directories("extern/imgui/")
+file(
+	GLOB ExternImGui
+		"extern/imgui/*.cpp"
+		"extern/imgui/*.h"
+		)
+
+target_link_libraries(NEA glfw imgui)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
