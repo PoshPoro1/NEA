@@ -18,16 +18,16 @@ FetchContent_Declare(glm
 	FIND_PACKAGE_ARGS NAMES glm)
 FetchContent_MakeAvailable(glm glfw3)
 
-add_executable(NEA src/main.cpp src/glad.c src/shader.cpp src/controls.cpp extern/imgui/backends/imgui_impl_glfw.cpp extern/imgui/backends/imgui_impl_opengl3.cpp extern/imgui/imgui.cpp extern/imgui/imgui_draw.cpp extern/imgui/imgui_tables.cpp extern/imgui/imgui_widgets.cpp)
+add_executable(NEA src/main.cpp src/glad.c src/shader.cpp src/controls.cpp include/imgui/imgui_impl_glfw.cpp include/imgui/imgui_impl_opengl3.cpp include/imgui/imgui.cpp include/imgui/imgui_draw.cpp include/imgui/imgui_tables.cpp include/imgui/imgui_widgets.cpp)
 target_include_directories(NEA PRIVATE include) 
-include_directories("extern/imgui/")
+include_directories("include/imgui/")
 file(
 	GLOB ExternImGui
 		"extern/imgui/*.cpp"
 		"extern/imgui/*.h"
 		)
 
-target_link_libraries(NEA glfw)
+target_link_libraries(NEA glfw glm)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
