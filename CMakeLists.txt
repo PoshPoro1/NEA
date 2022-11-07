@@ -18,6 +18,8 @@ FetchContent_Declare(glm
 	FIND_PACKAGE_ARGS NAMES glm)
 FetchContent_MakeAvailable(glm glfw3)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+
 add_executable(NEA src/main.cpp src/glad.c src/shader.cpp src/controls.cpp extern/imgui/backends/imgui_impl_glfw.cpp extern/imgui/backends/imgui_impl_opengl3.cpp extern/imgui/imgui.cpp extern/imgui/imgui_draw.cpp extern/imgui/imgui_tables.cpp extern/imgui/imgui_widgets.cpp)
 target_include_directories(NEA PRIVATE include) 
 include_directories("extern/imgui/")
