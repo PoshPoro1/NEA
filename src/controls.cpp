@@ -1,80 +1,45 @@
-#include <GLFW/glfw3.h>
-extern GLFWwindow* window;
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "controls.hpp"
-glm::mat4 ViewMatrix;
-glm::mat4 ProjectionMatrix;
-glm::mat4 getViewMatrix(){
-	return ViewMatrix;
-}
-glm::mat4 getProjectionMatrix(){
-	return ProjectionMatrix;
-}
-
-glm::vec3 position = glm::vec3(0,0,5);
-float hoizontalAngle = 3.14f;
-float verticalAngle = 0.0f;
-float initialFOV = 45.0f;
-float speed = 5.0f;
-float mouseSpeed = 0.005f;
-bool imguishow = false;
-
-void globalBindings(){
-	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
-		imguishow = !imguishow; // toggles imgui
-	}
-}
-
-void computeMatricesFromInputs(){
+void Camera::processInput(GLFWwindow* window){
 	static double lastTime = glfwGetTime();
 	double currentTime = glfwGetTime();
-
-	float deltaTime = float(currentTime - lastTime);
-
-	double xpos,ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-	glfwSetCursorPos(window, 1024.0f/2, 768.0f/2);
-	hoizontalAngle += mouseSpeed * float(1024.0f/2.0f - xpos);
-	verticalAngle += mouseSpeed * float(768.0f/2.0f-ypos);
-
-	glm::vec3 direction = glm::vec3(
-			cos(verticalAngle) * sin(hoizontalAngle),
-			sin(verticalAngle),
-			cos(verticalAngle) * cos(hoizontalAngle)
-	);
-	glm::vec3 right = glm::vec3(sin(hoizontalAngle-3.14f/2.0f), 0, cos(hoizontalAngle - 3.14f/2.0f));
-	glm::vec3 up = glm::cross(right, direction);
-
-
-	//PUT CONTROLS HERE!
-
-	{
-
-		if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-			position += direction*deltaTime*speed;
-		}
-		if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-			position -= direction * deltaTime * speed;
-		}
-		if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-			position += right * deltaTime * speed;
-		}
-		if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-			position -= right * deltaTime * speed;
-		}
+	float dTime = currentTime - lastTime;
+	const float camSpeed=0.05f * dTime;
+	if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+		camPos += camSpeed * camFront;
 	}
-
-	ProjectionMatrix = glm::perspective(glm::radians(60.0f), 4.0f/3.0f, 0.1f, 100.0f);
-	ViewMatrix = glm::lookAt(
-			position,
-			position+direction,
-			up
-			);
-	lastTime = currentTime;
+	if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+		camPos -= camSpeed * camFront;
+	}
+	if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+		camPos -= glm::normalize(glm::cross(camFront, camUp) * MoveSpeed);
+	}
+	if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+		camPos += glm::normalize(glm::cross(camFront, camUp) * MoveSpeed);
+	}
 }
+void Camera::UpdCamVec(){
+	glm::vec3 front;
+	front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+	front.y = sin(glm::radians(Pitch));
+	front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
 
+	camFront = glm::normalize(front);
+	camRight = glm::normalize(glm::cross(camFront, worldUp));
+	camUp = glm::normalize(glm::cross(camRight, camFront));
+
+}
+void Camera::CamProcessMouse(float xOffset, float yOffset){
+	xOffset *= Sens;
+	yOffset *= Sens;
+	Yaw += xOffset;
+	Pitch += yOffset;
+	if(Pitch > 89.0f){
+		Pitch = 89.0f;
+	}
+	if(Pitch < -89.0f){
+		Pitch = -89.0f;
+	}
+	UpdCamVec();
+}
 
 

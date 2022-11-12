@@ -15,6 +15,11 @@ GLFWwindow* window;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <vector>
+float yaw = -90.0f;
+float pitch;
+float sensitivity = 0.1f;
+bool firstMouseInput = true;
 
 #include "shader.hpp"
 #include "controls.hpp"
@@ -96,24 +101,6 @@ static const GLfloat g_color_buffer_data[] = {
     0.820f,  0.883f,  0.371f,
     0.982f,  0.099f,  0.879f
 };
-// Indices for vertices order
-GLuint indices[] =
-{
-	0, 1, 2,
-	0, 2, 3,
-	0, 1, 4,
-	1, 2, 4,
-	2, 3, 4,
-	3, 0, 4
-};
-
-//Keys I want to only call once after press
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
-	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
-		imguishow = !imguishow;
-		glfwSetCursorPos(window,1024.0f/2,768.0f/2.0f);
-	}
-}
 void framebufferSizeCallback(GLFWwindow* window, int width, int height){
 	glViewport(0,0,width,height);
 }
@@ -145,13 +132,13 @@ int main(){
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glfwSetKeyCallback(window, key_callback);
 
 
 
     const char* vertexPath = "Shaders/vertex.vs";
     const char* fragmentPath = "Shaders/fragment.fs";
     Shader myshader(vertexPath, fragmentPath);
+    std::vector<unsigned int> indicies;
     GLuint VAO, VBO, EBO, CAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -163,8 +150,16 @@ int main(){
     glGenBuffers(1, &CAO);
     glBindBuffer(GL_ARRAY_BUFFER, CAO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-    double lastTime = glfwGetTime();
-    int nbFrames = 0;
+    glm::vec3 model = glm::vec3(0.0f,0.0f,0.0f);
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::mat4 view = glm::lookAt(glm::vec3(0.0f,0.0f,3.0f),
+		    glm::vec3(0.0f,0.0f,0.0f),
+		    glm::vec3(0.0f,1.0f,0.0f));
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f,1.0f,0.0f);
+
+    Camera myCam(model,cameraPos ,view, cameraFront, cameraUp );
+    glfwSetCursorPosCallback(window, mouse_callback);
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -182,9 +177,6 @@ int main(){
 
 
     while (!(glfwWindowShouldClose(window))){
-	    if(imguishow == false){
-		    ImGui::SetMouseCursor(ImGuiMouseCursor_None);
-	    }
 	    if(wireframe == true && currentDraw ==1 ){
 		    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		    currentDraw = 0;
@@ -204,18 +196,22 @@ int main(){
 
 
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	    /*
 	    ImGui_ImplOpenGL3_NewFrame();
 	    ImGui_ImplGlfw_NewFrame();
 	    ImGui::NewFrame();
+	    */
 	    myshader.use();
-	    if(imguishow == false){
+	    processInput(window, myCam);
+	    /*	    if(imguishow == false){
 		    computeMatricesFromInputs();
 		    glm::mat4 Projection = getProjectionMatrix();
 		    glm::mat4 View = getViewMatrix();
 		    glm::mat4 Model = glm::mat4(1.0f);
 		    glm::mat4 mvp = Projection*View*Model;
 		    glUniformMatrix4fv(matID, 1, GL_FALSE, &mvp[0][0]);
-	    }
+		    }
+		    */
 
 	    glEnableVertexAttribArray(0);
 	    glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -225,7 +221,7 @@ int main(){
 
 	    glEnableVertexAttribArray(1);
 	    glBindBuffer(GL_ARRAY_BUFFER, CAO);
-	    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,(void*)0);
+	   /* glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,(void*)0);
 	    if(imguishow == true){
 		    ImGui::Begin("Window");
 		    ImGui::Text("Gamering");
@@ -236,13 +232,12 @@ int main(){
 			    glfwSetWindowShouldClose(window, 1);
 		    }
 
-
 		    ImGui::End();
 
 	    }
 	    ImGui::Render();
 	    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+*/
 
 
 
